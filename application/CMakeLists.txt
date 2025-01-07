@@ -16,7 +16,7 @@ project(
 
 
 # Library can be linked from local installation or downloaded.
-option(LibraryInstalled "On if the library is locally installed" FALSE)
+option(LibraryInstalled "TRUE if the library is locally installed" FALSE)
 
 if(LibraryInstalled)
 # Locate the package locally.
