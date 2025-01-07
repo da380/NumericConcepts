@@ -34,6 +34,10 @@ int main() {
 
   static_assert(NC::RealRange<std::vector<double>>);
 
+  static_assert(NC::RealRange<const std::vector<double>>);
+
+  static_assert(!NC::RealWritableRange<const std::vector<double>>);
+
   static_assert(NC::RealView<std::views::all_t<std::vector<double>>>);
 
   static_assert(!NC::ComplexView<std::views::all_t<std::vector<double>>>);
