@@ -1,6 +1,7 @@
 
 #include <complex>
 #include <functional>
+#include <iostream>
 #include <ranges>
 #include <string>
 #include <vector>
@@ -60,4 +61,8 @@ int main() {
 
   static_assert(
       !NumericConcepts::NumericFunction<std::function<std::string(int)>, int>);
+
+  std::cout << NumericConcepts::SameRangePrecision<
+                   std::vector<double>, std::ranges::views::all_t<std::vector<
+                                            std::complex<float>>>> << std::endl;
 }

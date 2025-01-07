@@ -90,4 +90,24 @@ concept RealOrComplexWritableView =
 template <typename T>
 concept NumericWritableView = NumericWritableRange<T> and std::ranges::view<T>;
 
+// Concept to check if a list of ranges have the same value type.
+template <typename T, typename... Ts>
+concept SameRangeValueType = requires() {
+  requires std::ranges::range<T> && (std::ranges::range<Ts> && ...);
+  requires(std::same_as<std::ranges::range_value_t<T>,
+                        std::ranges::range_value_t<Ts>> &&
+           ...);
+};
+
+// Return the precision or a real or complex range.
+template <RealOrComplexRange T>
+using RangePrecision = RemoveComplex<std::ranges::range_value_t<T>>;
+
+// Concept to check if a list of real or complex ranges have the same precision.
+template <typename T, typename... Ts>
+concept SameRangePrecision = requires() {
+  requires RealOrComplexRange<T> && (RealOrComplexRange<Ts> && ...);
+  requires(std::same_as<RangePrecision<T>, RangePrecision<Ts>> && ...);
+};
+
 } // namespace NumericConcepts
