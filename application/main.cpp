@@ -1,3 +1,3 @@
-#include "NC/Numeric.hpp"
+#include "NumericConcepts/Numeric.hpp"
 
-int main() { static_assert(NC::Real<double>); }
+int main() { static_assert(NumericConcepts::Real<double>); }

@@ -20,16 +20,16 @@ option(LibraryInstalled "TRUE if the library is locally installed" FALSE)
 
 if(LibraryInstalled)
 # Locate the package locally.
-find_package(NC REQUIRED CONFIG)
+find_package(NumericConcepts REQUIRED CONFIG)
 else()
 # Get the library from GitHub.
 include(FetchContent)
 FetchContent_Declare(
-  NC
-  GIT_REPOSITORY https://github.com/da380/NC.git
+  NumericConcepts
+  GIT_REPOSITORY https://github.com/da380/NumericConcepts.git
   GIT_TAG main
 )
-FetchContent_MakeAvailable(NC)
+FetchContent_MakeAvailable(NumericConcepts)
 endif()
 
 
@@ -42,4 +42,4 @@ target_sources(${PROJECT_NAME} PRIVATE main.cpp)
 
 # link the executable target against the imported target
 # must prefix the target with the namespace set during install
-target_link_libraries(${PROJECT_NAME} PUBLIC NC)
+target_link_libraries(${PROJECT_NAME} PUBLIC NumericConcepts)
