@@ -50,4 +50,6 @@ int main() {
 
   static_assert(
       !NC::NumericFunction<std::function<float(int)>, std::complex<double>>);
+
+  static_assert(!NC::NumericFunction<std::function<std::string(int)>, int>);
 }
