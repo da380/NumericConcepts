@@ -13,6 +13,16 @@ concept Integral = std::integral<T>;
 template <typename T>
 concept Real = std::floating_point<T>;
 
+// Concept for floating points at different precisions.
+template <typename T>
+concept Float = std::same_as<T, float>;
+
+template <typename T>
+concept Double = std::same_as<T, double>;
+
+template <typename T>
+concept LongDouble = std::same_as<T, long double>;
+
 // Concept for complex types.
 template <typename T> struct ComplexType : public std::false_type {};
 
