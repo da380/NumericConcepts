@@ -84,4 +84,4 @@ the option used set by the variable logical ```-DLibraryInstalled```.
 
 ## Acknowledgements
 
-The CMake files within this project are based on the templated provided by https://github.com/pr0g/cmake-examples.git
+The CMake files within this project are based on the examples provided in https://github.com/pr0g/cmake-examples.git
