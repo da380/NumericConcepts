@@ -9,32 +9,32 @@ The aim of the library is to collect a number of useful concepts in one place fo
 The aim is to help working with numeric types along with containers of such types. By a numeric type, I mean integers, real and complex numbers. 
 
 As a first example, suppose you have a templated function of a single argument:
-```
+```c++
 template <typename T>
 auto f(T i) { return i+1;}
 ```
 if it is required that the type of the argument be integral, we can instead write:
-```
+```c++
 template <NumericConcepts::Integral T>
 auto f(T i) {return std::abs(i);}
-```
+```c++
 In this case, the concept is just a renaming of std::integral from the Concepts Library, and so little is actually gained. The use of this library is collecting and combining together a number of such concepts.
 For example, suppose our function can take in any numeric type, we could 
 then write 
-```
+```c++
 template <NumericConcepts::Numeric T>
 auto f(T i) {return std::abs(i);}
 ```
 
 A second example relates to complex numbers (implemented as instances of ```std::complex```) for which, currently, there are not pre-defined concepts in the standard library. First, we can require that a templated function is restricted to complex types:
-```
+```c++
 template <NumericConcepts::Complex T>
 auto f(T i) {return std::arg(i);}
 ```
 We can also extract the base type from a ```std::complex``` variable
 which, for example, allows use to check that arithmetic operations are 
 well-defined:
-```
+```c++
 template<NumericConcepts::Real T, NumericConcepts::Complex S>
 requires std::same_as<T, NumericConcepts::RemoveComplex<S>>
 auto f(T a, S x) {return a * s;}
@@ -44,6 +44,15 @@ Next, we can consider containers of numeric types. Suppose we
 have a templated function that acts on ranges over real numbers. 
 This can be enforced by use of ```NumericConcepts::RealRange```, while analogous 
 concepts are defined for other numeric types along with views and viewable ranges. 
+As an example, consider a function that takes in a numeric view and doubles its values:
+```c++
+template <NumericWritableView V>
+void f(V view) {    
+    for(auto& val : view) {
+        val *= static_cast<std::ranges::range_value_t<V>>(2);
+    }
+}
+```
 
 
 
