@@ -2,7 +2,7 @@
 
 #include "Numeric.hpp"
 
-namespace NC {
+namespace NumericConcepts {
 
 // Concepts for ranges.
 template <typename T>
@@ -90,4 +90,4 @@ concept RealOrComplexWritableView =
 template <typename T>
 concept NumericWritableView = NumericWritableRange<T> and std::ranges::view<T>;
 
-} // namespace NC
+} // namespace NumericConcepts

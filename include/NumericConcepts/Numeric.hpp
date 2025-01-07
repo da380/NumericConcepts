@@ -3,7 +3,7 @@
 #include <complex>
 #include <concepts>
 
-namespace NC {
+namespace NumericConcepts {
 
 // Concept for integral types.
 template <typename T>
@@ -17,7 +17,7 @@ concept Real = std::floating_point<T>;
 template <typename T> struct ComplexType : public std::false_type {};
 
 template <typename T>
-struct ComplexType<std::complex<T>> : public std::bool_constant<NC::Real<T>> {};
+struct ComplexType<std::complex<T>> : public std::bool_constant<Real<T>> {};
 
 template <typename T>
 concept Complex = ComplexType<T>::value;
@@ -48,4 +48,4 @@ concept RealOrComplex = Real<T> or Complex<T>;
 template <typename T>
 concept Numeric = Integral<T> or RealOrComplex<T>;
 
-} // namespace NC
+} // namespace NumericConcepts

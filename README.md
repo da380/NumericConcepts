@@ -1,4 +1,4 @@
-# NC
+# Numeric Concepts
 
 A collection of c++20 concepts for working with numeric types, which is to say integers, reals and complex numbers. 
 
@@ -15,34 +15,34 @@ auto f(T i) { return i+1;}
 ```
 if it is required that the type of the argument be integral, we can instead write:
 ```
-template <NC::Integral T>
+template <NumericConcepts::Integral T>
 auto f(T i) {return std::abs(i);}
 ```
 In this case, the concept is just a renaming of std::integral from the Concepts Library, and so little is actually gained. The use of this library is collecting and combining together a number of such concepts.
 For example, suppose our function can take in any numeric type, we could 
 then write 
 ```
-template <NC::Numeric T>
+template <NumericConcepts::Numeric T>
 auto f(T i) {return std::abs(i);}
 ```
 
 A second example relates to complex numbers (implemented as instances of ```std::complex```) for which, currently, there are not pre-defined concepts in the standard library. First, we can require that a templated function is restricted to complex types:
 ```
-template <NC::Complex T>
+template <NumericConcepts::Complex T>
 auto f(T i) {return std::arg(i);}
 ```
 We can also extract the base type from a ```std::complex``` variable
 which, for example, allows use to check that arithmetic operations are 
 well-defined:
 ```
-template<NC::Real T, NC::Complex S>
-requires std::same_as<T, NC::RemoveComplex<S>>
+template<NumericConcepts::Real T, NumericConcepts::Complex S>
+requires std::same_as<T, NumericConcepts::RemoveComplex<S>>
 auto f(T a, S x) {return a * s;}
 ```
 
 Next, we can consider containers of numeric types. Suppose we 
 have a templated function that acts on ranges over real numbers. 
-This can be enforced by use of ```NC::RealRange```, while analogous 
+This can be enforced by use of ```NumericConcepts::RealRange```, while analogous 
 concepts are defined for other numeric types along with views and viewable ranges. 
 
 
@@ -55,12 +55,12 @@ It can be built and installed using CMake as follows:
 
 - Clone the repository:
 ```
-git clone https://github.com/da380/NC.git
+git clone https://github.com/da380/NumericConcepts.git
 ```
 
 - Configure the build:
 ```
-cd NC
+cd NumericConcepts
 cmake -S . -B build
 ```
 A prefix for the installation can be set through the variable ```-DCMAKE_INSTALL_PREFIX```. If this variable is not set, 
