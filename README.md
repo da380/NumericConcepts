@@ -17,7 +17,7 @@ if it is required that the type of the argument be integral, we can instead writ
 ```c++
 template <NumericConcepts::Integral T>
 auto f(T i) {return std::abs(i);}
-```c++
+```
 In this case, the concept is just a renaming of std::integral from the Concepts Library, and so little is actually gained. The use of this library is collecting and combining together a number of such concepts.
 For example, suppose our function can take in any numeric type, we could 
 then write 
