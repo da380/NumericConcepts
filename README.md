@@ -6,7 +6,7 @@ A collection of c++20 concepts for working with numeric types, which is to say i
 
 The library is header only and has no dependencies. 
 
-It can be built and installed using CMAKE as follows:
+It can be built and installed using CMake as follows:
 
 - Clone the repository:
 ```
@@ -26,7 +26,7 @@ the default GNU install location will be used.
 cmake --build build --target install
 ```
 
-## Inclusion in another CMAKE project
+## Inclusion in another CMake project
 
 If the library has been installed localled, then it can be 
 located using the find_package method. Alternatively, it 
@@ -38,4 +38,4 @@ Within the application directory a simple CMAKE project that uses the library is
 
 ## Acknowledgements
 
-The CMAKE files within this project are based on the templated provided by https://github.com/pr0g/cmake-examples.git
+The CMake files within this project are based on the templated provided by https://github.com/pr0g/cmake-examples.git
