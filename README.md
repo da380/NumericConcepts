@@ -34,7 +34,8 @@ can be included as a dependency using FetchContent. Given the
 small size and header-only nature of the library, the latter 
 method will likely be the most convenient. 
 
-Within the application directory a simple CMAKE project that uses the library is shown, with both methods of inclusion shown. 
+Within the application directory a simple CMake project that uses the library is shown. Both methods of inclusion implemented, with 
+the option used set by the variable logical -DLibraryInstalled.
 
 ## Acknowledgements
 
