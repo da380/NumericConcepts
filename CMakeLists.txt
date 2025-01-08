@@ -11,8 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
-option(BUILD_EXAMPLES "Build the example programs" ON)
-if(BUILD_EXAMPLES)
+
+# Build examples for direct builds. 
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     add_subdirectory(examples)
 endif()
 
