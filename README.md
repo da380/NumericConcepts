@@ -31,14 +31,7 @@ cmake --build build --target install
 
 ## Inclusion in another CMake project
 
-If the library has been installed localled, then it can be 
-located using the find_package method. Alternatively, it 
-can be included as a dependency using FetchContent. Given the
-small size and header-only nature of the library, the latter 
-method will likely be the most convenient. 
-
-Within the application directory a simple CMake project that uses the library is shown. Both methods of inclusion implemented, with 
-the option used set by the logical  variable ```-DLibraryInstalled```.
+The library is best included using CMake's  Fetch_Content method. An example of this can be seen within the application directory.
 
 ## Acknowledgements
 

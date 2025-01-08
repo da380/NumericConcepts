@@ -14,15 +14,6 @@ project(
     LANGUAGES CXX)
 
 
-
-# Library can be linked from local installation or downloaded.
-option(LibraryInstalled "TRUE if the library is locally installed" FALSE)
-
-if(LibraryInstalled)
-# Locate the package locally.
-find_package(NumericConcepts REQUIRED CONFIG)
-else()
-# Get the library from GitHub.
 include(FetchContent)
 FetchContent_Declare(
   NumericConcepts
@@ -30,8 +21,6 @@ FetchContent_Declare(
   GIT_TAG main
 )
 FetchContent_MakeAvailable(NumericConcepts)
-endif()
-
 
 
 # add an executable target
