@@ -103,6 +103,13 @@ concept SameRangeValueType = requires() {
 template <RealOrComplexRange T>
 using RangePrecision = RemoveComplex<std::ranges::range_value_t<T>>;
 
+// Concept to check if a list of real or complex ranges are the same.
+template <typename T, typename... Ts>
+concept SameRange = requires() {
+  requires RealOrComplexRange<T> && (RealOrComplexRange<Ts> && ...);
+  requires(std::same_as<T, Ts> && ...);
+};
+
 // Concept to check if a list of real or complex ranges have the same precision.
 template <typename T, typename... Ts>
 concept SameRangePrecision = requires() {
@@ -110,4 +117,4 @@ concept SameRangePrecision = requires() {
   requires(std::same_as<RangePrecision<T>, RangePrecision<Ts>> && ...);
 };
 
-} // namespace NumericConcepts
+}  // namespace NumericConcepts

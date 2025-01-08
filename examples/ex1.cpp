@@ -6,9 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "NumericConcepts/Functions.hpp"
-#include "NumericConcepts/Numeric.hpp"
-#include "NumericConcepts/Ranges.hpp"
+#include "NumericConcepts/NumericConcepts.hpp"
 
 int main() {
   static_assert(NumericConcepts::Real<float>);
@@ -61,6 +59,15 @@ int main() {
 
   static_assert(
       !NumericConcepts::NumericFunction<std::function<std::string(int)>, int>);
+
+  static_assert(
+      NumericConcepts::WritableIterator<std::vector<double>::iterator>);
+
+  static_assert(
+      NumericConcepts::RealWritableIterator<std::vector<double>::iterator>);
+
+  static_assert(!NumericConcepts::RealWritableIterator<
+                std::vector<double>::const_iterator>);
 
   std::cout << NumericConcepts::SameRangePrecision<
                    std::vector<double>, std::ranges::views::all_t<std::vector<
