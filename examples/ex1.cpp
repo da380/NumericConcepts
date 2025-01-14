@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "NumericConcepts.hpp"
+#include "NumericConcepts/NumericConcepts.hpp"
 
 int main() {
   static_assert(NumericConcepts::Real<float>);
