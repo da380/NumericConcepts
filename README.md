@@ -44,4 +44,4 @@ target_link_libraries(YourApp PRIVATE NumericConcepts)
 
 ## Documentation
 
-See the wiki page for detail of the library and examples of its use. 
+See the [wiki](https://github.com/da380/NumericConcepts/wiki) page for detail of the library and examples of its use. 
