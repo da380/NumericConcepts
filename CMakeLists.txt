@@ -42,8 +42,6 @@ if(BUILD_DOCS)
       COMMENT "Generating API documentation with Doxygen..."
       VERBATIM
   )
-  # A more modern alternative using the provided module function:
-  # doxygen_add_docs(doc ${CMAKE_CURRENT_SOURCE_DIR} COMMENT "Generating API documentation")
 
 endif()
 
