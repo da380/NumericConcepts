@@ -21,34 +21,32 @@ target_include_directories(
 # Optionally, add examples for local development
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     add_subdirectory(examples)
+
+
+    #Optionally build documentation. 
+    option(BUILD_DOCS "Build the Doxygen documentation" OFF)
+
+    if(BUILD_DOCS)
+    find_package(Doxygen REQUIRED)
+
+    # Configure the Doxyfile using the template
+    set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
+    configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+
+    # Add a target to build the documentation
+    add_custom_target(
+        doc ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen..."
+        VERBATIM
+      )
+
+    endif()
+
+
 endif()
 
 
-
-
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-
-#Optionally build documentation. 
-option(BUILD_DOCS "Build the Doxygen documentation" OFF)
-
-if(BUILD_DOCS)
-  find_package(Doxygen REQUIRED)
-
-  # Configure the Doxyfile using the template
-  set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
-  configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-
-  # Add a target to build the documentation
-  add_custom_target(
-      doc ALL
-      COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Generating API documentation with Doxygen..."
-      VERBATIM
-  )
-
-endif()
-
-endif()
 
 
