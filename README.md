@@ -1,14 +1,42 @@
-# Numeric Concepts
+# NumericConcepts
 
-A collection of c++20 concepts for working with numeric types, which is to say integers, reals and complex numbers.
+![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)
+![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)
 
-The aim of the library is to collect a number of useful concepts in one place for inclusion in other projects. Some of the concepts are direct re-namings of those within the standard Concept Library, while the others are simple combinations thereof. Nonetheless, these are things I have found useful repeatedly.
+A header-only C++20 library providing a cohesive set of concepts for generic programming with numeric types. `NumericConcepts` makes your template code safer, more readable, and easier to debug by providing clear, compile-time constraints.
 
+---
 
-## Inclusion in another CMake project
+## Features
 
-The library should be included using CMake's  Fetch_Content method. 
+-   **Type Concepts**: Constrain templates to `Integral`, `Real`, `Complex`, `RealOrComplex`, and `Numeric` types.
+-   **Iterator Concepts**: Type-safe concepts for both read-only and writable iterators over numeric types.
+-   **Range & View Concepts**: Modern C++20 concepts for numeric ranges and views, like `RealRange` and `ComplexWritableView`.
+-   **Function Concepts**: Constrain callables based on their numeric return types (e.g., `RealFunction`).
 
-## Acknowledgements
+---
 
-The CMake files within this project are based on the examples provided in https://github.com/pr0g/cmake-examples.git
+## Requirements
+
+-   A **C++20** compatible compiler (e.g., GCC 10+, Clang 12+, MSVC v19.29+).
+-   **CMake** 3.14+ (for the recommended installation method).
+
+---
+
+## Installation
+
+The recommended way to integrate this library is with CMake's `FetchContent`. Add the following to your `CMakeLists.txt`:
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+  NumericConcepts
+  GIT_REPOSITORY "[https://github.com/your-org/NumericConcepts.git](https://github.com/your-org/NumericConcepts.git)" #<-- Replace with the actual repository URL
+  GIT_TAG        "main" #<-- Or a specific version/tag like v1.0.0
+)
+
+FetchContent_MakeAvailable(NumericConcepts)
+
+# Link to your target
+target_link_libraries(YourApp PRIVATE NumericConcepts)
