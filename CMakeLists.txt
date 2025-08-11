@@ -24,6 +24,10 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 
+
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+
 #Optionally build documentation. 
 option(BUILD_DOCS "Build the Doxygen documentation" OFF)
 
@@ -42,6 +46,8 @@ if(BUILD_DOCS)
       COMMENT "Generating API documentation with Doxygen..."
       VERBATIM
   )
+
+endif()
 
 endif()
 
