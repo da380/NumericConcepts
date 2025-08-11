@@ -40,3 +40,7 @@ FetchContent_MakeAvailable(NumericConcepts)
 
 # Link to your target
 target_link_libraries(YourApp PRIVATE NumericConcepts)
+
+## Documentation
+
+See the wiki page for detail of the library and examples of its use. 
