@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0135 NEW)
 
 project(
     NumericConcepts
@@ -19,16 +20,23 @@ target_include_directories(
 )
 
 
+# --- Installation and Packaging ---
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# Install the library target and add it to an export set
+# Install the library target and add it to an export set.
+# For an INTERFACE library, this installs no files, but makes the target available for export.
 install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
 )
 
-# Install the exported targets file
+# [FIX] Install the public header files.
+# This is the crucial step that makes the headers available to downstream projects.
+install(DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install the exported targets file, which references the installed headers
 install(EXPORT ${PROJECT_NAME}Targets
     FILE ${PROJECT_NAME}Targets.cmake
     NAMESPACE ${PROJECT_NAME}::
@@ -55,57 +63,47 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/cmake
 )
+# --- End of Installation and Packaging ---
 
-# Optionally, add examples for local development
+
+# --- Standalone Project Guard for examples, docs, and tests ---
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     add_subdirectory(examples)
 
-
-    #Optionally build documentation. 
+    #Optionally build documentation.
     option(BUILD_DOCS "Build the Doxygen documentation" OFF)
 
     if(BUILD_DOCS)
-    find_package(Doxygen REQUIRED)
-
-    # Configure the Doxyfile using the template
-    set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
-    configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-
-    # Add a target to build the documentation
-    add_custom_target(
-        doc ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating API documentation with Doxygen..."
-        VERBATIM
+      find_package(Doxygen REQUIRED)
+      set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
+      configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+      add_custom_target(
+          doc ALL
+          COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+          COMMENT "Generating API documentation with Doxygen..."
+          VERBATIM
       )
-
     endif()
 
-
     # --- Optional GTest Integration ---
-    option(BUILD_TESTS "Build the tests for NumericConcepts" OFF)
+    option(NUMERIC_CONCEPTS_BUILD_TESTS "Build the tests for NumericConcepts" OFF)
 
-    if(BUILD_TESTS)
-        # Enable testing for the project
+    if(NUMERIC_CONCEP_TS_BUILD_TESTS)
         enable_testing()
-
-        # Fetch the Google Test framework
         include(FetchContent)
+
+        # Tell googletest not to install itself
+        set(INSTALL_GTEST OFF)
+
         FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/v1.14.0.zip
+          googletest
+          URL https://github.com/google/googletest/archive/v1.14.0.zip
         )
         FetchContent_MakeAvailable(googletest)
 
-        # Add the subdirectory for your tests
         add_subdirectory(tests)
     endif()
     # --- End of Optional GTest Integration ---
 
-
 endif()
-
-
-
-
