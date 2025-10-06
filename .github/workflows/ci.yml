@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build
 
-      # Runs the tests
+      # Runs the tests      
       - name: Run Tests
-        working-directory: ${{github.workspace}}/build
-        run: ctest
+      # Use the built-in test target which calls ctest with the correct configuration
+        run: cmake --build ${{github.workspace}}/build --target test
