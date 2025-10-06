@@ -87,9 +87,9 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     endif()
 
     # --- Optional GTest Integration ---
-    option(NUMERIC_CONCEPTS_BUILD_TESTS "Build the tests for NumericConcepts" OFF)
+    option(BUILD_TESTS "Build the tests for NumericConcepts" OFF)
 
-    if(NUMERIC_CONCEP_TS_BUILD_TESTS)
+    if(BUILD_TESTS)
         enable_testing()
         include(FetchContent)
 
