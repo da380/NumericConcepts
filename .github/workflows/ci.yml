@@ -33,7 +33,7 @@ jobs:
         run: >
           cmake -B ${{github.workspace}}/build 
           -S ${{github.workspace}}
-          -DNUMERIC_CONCEPTS_BUILD_TESTS=ON
+          -DBUILD_TESTS=ON
 
       # Builds the project
       - name: Build
