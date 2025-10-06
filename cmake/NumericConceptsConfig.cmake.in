@@ -1,0 +1,4 @@
+@PACKAGE_INIT@
+
+# This file includes the exported targets (e.g., NumericConcepts::NumericConcepts)
+include("${CMAKE_CURRENT_LIST_DIR}/NumericConceptsTargets.cmake")
