@@ -1,0 +1,45 @@
+name: C++ CI
+
+# 1. Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# 2. A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build-and-test"
+  build-and-test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # 3. Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Sets up the build directory
+      - name: Create build directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      # Runs CMake to configure the project, enabling tests
+      - name: Configure CMake
+        run: >
+          cmake -B ${{github.workspace}}/build 
+          -S ${{github.workspace}}
+          -DNUMERIC_CONCEPTS_BUILD_TESTS=ON
+
+      # Builds the project
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build
+
+      # Runs the tests
+      - name: Run Tests
+        working-directory: ${{github.workspace}}/build
+        run: ctest

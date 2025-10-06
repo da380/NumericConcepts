@@ -83,6 +83,27 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     endif()
 
 
+    # --- Optional GTest Integration ---
+    option(BUILD_TESTS "Build the tests for NumericConcepts" OFF)
+
+    if(BUILD_TESTS)
+        # Enable testing for the project
+        enable_testing()
+
+        # Fetch the Google Test framework
+        include(FetchContent)
+        FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/v1.14.0.zip
+        )
+        FetchContent_MakeAvailable(googletest)
+
+        # Add the subdirectory for your tests
+        add_subdirectory(tests)
+    endif()
+    # --- End of Optional GTest Integration ---
+
+
 endif()
 
 
