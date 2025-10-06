@@ -9,6 +9,7 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(GNUInstallDirs)
 
 # Define a header-only INTERFACE library
 add_library(${PROJECT_NAME} INTERFACE)
@@ -22,7 +23,6 @@ target_include_directories(
 
 
 # --- Installation and Packaging ---
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # Install the library target and add it to an export set.
