@@ -29,7 +29,7 @@ You can integrate `NumericConcepts` into your project in two ways. Using `find_p
 
 ### Method 1: `find_package` (Recommended)
 
-This method allows you to build and install the library once and then link to it from any project. Note that this because this is 
+This method allows you to build and install the library once and then link to it from any project. Because this is 
 a header-only library, the build step is trivial, while install just copies the header files to the desired location. 
 
 **1. Build and Install `NumericConcepts`**
