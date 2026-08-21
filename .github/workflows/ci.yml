@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # gcc-10 / clang-14 are the floor the README claims support for, so
+          # gcc-10 / clang-16 are the floor the README claims support for, so
           # they are tested rather than assumed; the rest are current releases.
           - name: ubuntu / gcc-10
             os: ubuntu-22.04
@@ -31,11 +31,11 @@ jobs:
             cc: gcc-14
             cxx: g++-14
             packages: g++-14
-          - name: ubuntu / clang-14
-            os: ubuntu-22.04
-            cc: clang-14
-            cxx: clang++-14
-            packages: clang-14
+          - name: ubuntu / clang-16
+            os: ubuntu-24.04
+            cc: clang-16
+            cxx: clang++-16
+            packages: clang-16
           - name: ubuntu / clang-18 + libc++
             os: ubuntu-24.04
             cc: clang-18
@@ -72,10 +72,50 @@ jobs:
           -DNUMERICCONCEPTS_BUILD_EXAMPLES=ON
 
       - name: Build tests
-        run: cmake --build build --config Release --parallel --target run_tests
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build build --config Release --parallel --target numericconcepts_tests \
+            2>&1 | tee build-tests.log
 
       - name: Build examples
-        run: cmake --build build --config Release --parallel
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build build --config Release --parallel 2>&1 \
+            | tee build-examples.log
+
+      # Compiler diagnostics are buried in the raw log, which needs repository
+      # admin to download. Repeating the first few as annotations puts them on
+      # the run summary, where anyone looking at a red tick can see them.
+      # Compiler diagnostics are buried in the raw log, which needs repository
+      # admin to download. Repeating the important lines as annotations puts
+      # them on the run summary, where anyone with read access can see them.
+      # GitHub runs bash with -eo pipefail, so nothing here may abort the step.
+      - name: Surface the failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          emit() {  # emit <level> <label> <text>
+            while IFS= read -r line; do
+              [ -n "$line" ] && printf '::%s::[%s] %s\n' "$1" "$2" "${line//%/%25}"
+            done <<< "$3"
+          }
+          for log in build-tests.log build-examples.log; do
+            [ -f "$log" ] || continue
+            # The diagnostics themselves.
+            emit error "$log" \
+              "$(grep -iE "(: |\()error( C[0-9]+)?[:)]" "$log" | sed -n '1,6p')"
+            # For a template error the useful part is the instantiation trail,
+            # which is what names a file of ours rather than a standard header.
+            emit warning "$log" \
+              "$(grep -E "(examples|tests|include)[/\\][^ ]*: (note|error):" "$log" \
+                 | sed -n '1,8p')"
+            # And the tail, which carries the failure of any custom build step.
+            emit notice "$log" "$(grep -v '^[[:space:]]*$' "$log" | tail -10)"
+          done
+          exit 0
 
       - name: Test
         run: ctest --test-dir build --build-config Release --output-on-failure

@@ -21,7 +21,10 @@ if(NOT GTest_FOUND)
     FetchContent_MakeAvailable(googletest)
 endif()
 
-add_executable(run_tests
+# Not "run_tests": the Visual Studio generator creates a built-in RUN_TESTS
+# target, and Windows filesystems are case-insensitive, so the two projects
+# collide and building ours invokes CTest instead.
+add_executable(numericconcepts_tests
     test_numeric.cpp
     test_algebra.cpp
     test_iterators.cpp
@@ -30,13 +33,13 @@ add_executable(run_tests
     test_version.cpp
 )
 
-target_link_libraries(run_tests PRIVATE
+target_link_libraries(numericconcepts_tests PRIVATE
     GTest::gtest_main
     NumericConcepts::NumericConcepts
 )
 
 include(GoogleTest)
-gtest_discover_tests(run_tests)
+gtest_discover_tests(numericconcepts_tests)
 
 # The headers are self-contained: each must compile on its own, with no other
 # NumericConcepts header included first.

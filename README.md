@@ -125,7 +125,10 @@ Full documentation, including the design rationale, is in
 
 ## Requirements
 
-- A C++20 compiler. GCC 10+, Clang 14+ and MSVC 19.29+ are exercised by CI.
+- A C++20 compiler. GCC 10+, Clang 16+ and MSVC 19.29+ are exercised by CI.
+  The headers themselves compile with Clang 14, but that release paired with
+  libstdc++ 12 mishandles some standard `<ranges>` pipelines, so it is not
+  claimed as supported.
 - CMake 3.15 or later.
 
 ## Using it
