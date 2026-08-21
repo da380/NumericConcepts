@@ -129,7 +129,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        method: [find_package, FetchContent]
+        method: [find_package, FetchContent, FetchContent-export]
     steps:
       - uses: actions/checkout@v5
 
@@ -164,6 +164,19 @@ jobs:
           endif()
           add_executable(app main.cpp)
           target_link_libraries(app PRIVATE NumericConcepts::NumericConcepts)
+
+          # A library that links NumericConcepts publicly and exports itself
+          # can only be installed if NumericConcepts is in an export set too.
+          # That is why NUMERICCONCEPTS_INSTALL stays on for a subproject, so
+          # the case is built rather than assumed.
+          if(METHOD STREQUAL "FetchContent-export")
+            add_library(consumerlib INTERFACE)
+            target_link_libraries(consumerlib
+                                  INTERFACE NumericConcepts::NumericConcepts)
+            install(TARGETS consumerlib EXPORT ConsumerTargets)
+            install(EXPORT ConsumerTargets FILE ConsumerTargets.cmake
+                    NAMESPACE Consumer:: DESTINATION lib/cmake/Consumer)
+          endif()
           CMAKE
 
       - name: Configure and build the consumer
@@ -171,8 +184,13 @@ jobs:
           cmake -S consumer -B consumer/build \
             -DMETHOD=${{ matrix.method }} \
             -DSOURCE_DIR="$PWD" \
-            -DCMAKE_PREFIX_PATH="$PWD/stage"
+            -DCMAKE_PREFIX_PATH="$PWD/stage" \
+            -DCMAKE_INSTALL_PREFIX="$PWD/consumer/stage"
           cmake --build consumer/build
+
+      - name: Install the consumer
+        if: matrix.method == 'FetchContent-export'
+        run: cmake --install consumer/build
 
   format:
     name: clang-format

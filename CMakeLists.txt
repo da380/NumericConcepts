@@ -60,6 +60,13 @@ endif()
 
 # --- Options ---
 
+# ON even when this is a subproject, which is deliberate and unlike the usual
+# top-level-only default. A library that links NumericConcepts publicly and
+# exports its own targets cannot be installed unless NumericConcepts is in an
+# export set too: CMake refuses with "includes target X which requires target
+# NumericConcepts that is not in any export set". Since being consumed by such
+# libraries is the point of this one, the rules stay on, and a consumer that
+# genuinely does not want them says so.
 option(NUMERICCONCEPTS_INSTALL "Generate the install rules for NumericConcepts" ON)
 option(NUMERICCONCEPTS_BUILD_EXAMPLES "Build the examples" ${NUMERICCONCEPTS_IS_TOP_LEVEL})
 option(NUMERICCONCEPTS_BUILD_TESTS "Build the tests" OFF)
@@ -96,6 +103,11 @@ if(NUMERICCONCEPTS_INSTALL)
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
 
+    # SameMajorVersion, rather than the AnyNewerVersion this used to be, matches
+    # the promise the README makes: within a major version the vocabulary only
+    # grows, so any later release satisfies an earlier request, but a future 2.x
+    # must not silently satisfy find_package(NumericConcepts 1.0).
+    #
     # ARCH_INDEPENDENT: there is nothing architecture-specific in a set of
     # headers, so a 64-bit install must not be rejected by a 32-bit consumer.
     write_basic_package_version_file(

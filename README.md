@@ -196,7 +196,7 @@ building this repository directly.
 | `NUMERICCONCEPTS_BUILD_TESTS`     | `OFF`          | Build the GoogleTest suite            |
 | `NUMERICCONCEPTS_BUILD_EXAMPLES`  | on if top-level | Build the programs in `examples/`     |
 | `NUMERICCONCEPTS_BUILD_DOCS`      | `OFF`          | Build the Doxygen documentation       |
-| `NUMERICCONCEPTS_INSTALL`         | `ON`           | Generate the install rules            |
+| `NUMERICCONCEPTS_INSTALL`         | `ON`           | Generate the install rules, even as a subproject |
 
 ```bash
 cmake -S . -B build -DNUMERICCONCEPTS_BUILD_TESTS=ON
@@ -206,11 +206,22 @@ ctest --test-dir build --output-on-failure
 
 The unprefixed `BUILD_TESTS` and `BUILD_DOCS` still work, but are deprecated.
 
+`NUMERICCONCEPTS_INSTALL` stays on when NumericConcepts is a subproject, which
+differs from the common top-level-only default. A library that links it
+publicly and exports its own targets cannot be installed otherwise — CMake
+refuses with *"requires target NumericConcepts that is not in any export
+set"* — and being consumed by such libraries is the point of this one. Turn it
+off if your project really does not want the rules.
+
 ## Versioning
 
-Releases are tagged `vMAJOR.MINOR.PATCH`. While the major version is `0`, minor
-releases may add concepts but will avoid changing the meaning of an existing
-one.
+Releases are tagged `vMAJOR.MINOR.PATCH`. Within a major version the vocabulary
+only grows: a minor release may add concepts, but will avoid changing the
+meaning of an existing one.
+
+The installed package declares `SameMajorVersion` compatibility, so
+`find_package(NumericConcepts 0.1)` is satisfied by any later `0.x` and not by
+a future `1.0`.
 
 ## Licence
 
