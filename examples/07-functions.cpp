@@ -104,9 +104,11 @@ int main() {
   static_assert(!RealFunction<decltype(real_lambda), double, double>);
 
   // Functions of several arguments, and free functions, are handled the same.
+  // The lambda is named rather than written inside decltype: lambdas in
+  // unevaluated contexts are C++20, and not every supported compiler has them.
+  auto binary_lambda = [](double x, double y) { return x + y; };
   static_assert(RealFunction<decltype(&Square), double>);
-  static_assert(RealFunction<decltype([](double x, double y) { return x + y; }),
-                             double, double>);
+  static_assert(RealFunction<decltype(binary_lambda), double, double>);
 
   // The general Function concept fixes the return type rather than a category,
   // and allows a conversion to it.

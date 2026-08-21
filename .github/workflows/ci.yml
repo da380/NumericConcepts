@@ -52,7 +52,7 @@ jobs:
             cxx: cl
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install compiler packages
         if: runner.os == 'Linux'
@@ -71,7 +71,10 @@ jobs:
           -DNUMERICCONCEPTS_BUILD_TESTS=ON
           -DNUMERICCONCEPTS_BUILD_EXAMPLES=ON
 
-      - name: Build
+      - name: Build tests
+        run: cmake --build build --config Release --parallel --target run_tests
+
+      - name: Build examples
         run: cmake --build build --config Release --parallel
 
       - name: Test
@@ -88,7 +91,7 @@ jobs:
       matrix:
         method: [find_package, FetchContent]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install NumericConcepts
         if: matrix.method == 'find_package'
@@ -135,7 +138,7 @@ jobs:
     name: clang-format
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Pinned: a different clang-format version reformats differently, and a
       # style-only failure here would say nothing useful.
       - run: sudo apt-get update && sudo apt-get install -y clang-format-18
@@ -148,7 +151,7 @@ jobs:
     name: doxygen
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y doxygen
       - run: cmake -S . -B build -DNUMERICCONCEPTS_BUILD_DOCS=ON
       - run: cmake --build build --target docs

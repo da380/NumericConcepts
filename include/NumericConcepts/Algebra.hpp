@@ -76,6 +76,27 @@ concept FieldOf = RingOf<T> && requires(T a, const T b) {
 
 /**
  * @internal
+ * @brief The default associated real type: empty unless T is RealOrComplex.
+ *
+ * Selected on an ordinary bool argument rather than by constraining a
+ * specialisation whose argument list matches the primary template's parameter
+ * list. That form is valid C++20, but is rejected by MSVC and by Clang before
+ * version 16, both of which this library supports.
+ */
+template <typename T, bool = RealOrComplex<T>>
+struct DefaultRealType {};
+
+/**
+ * @internal
+ * @brief The associated real type of a standard real or complex type.
+ */
+template <typename T>
+struct DefaultRealType<T, true> {
+  using type = RemoveComplex<T>;
+};
+
+/**
+ * @internal
  * @brief The requirements of ScalableBy, on cv-unqualified types.
  */
 template <typename T, typename S>
@@ -137,9 +158,10 @@ concept ScalableBy =
 
 /**
  * @brief Customisation point declaring the real type associated with a scalar.
- * @details The primary template is empty, so a type has no associated real type
- * until one is declared. Specialisations are provided for the floating-point
- * types and for `std::complex`; a user-defined scalar declares its own:
+ * @details The primary template already covers every type satisfying
+ * RealOrComplex, for which the answer is RemoveComplex. Any other type has no
+ * associated real type until one is declared, and a user-defined scalar
+ * declares its own:
  *
  * ```cpp
  * template <NumericConcepts::Real T>
@@ -153,25 +175,7 @@ concept ScalableBy =
  * @tparam T The scalar type.
  */
 template <typename T>
-struct RealTypeTraits {};
-
-/**
- * @brief Specialisation of RealTypeTraits for the floating-point types.
- * @tparam T The floating-point type.
- */
-template <Real T>
-struct RealTypeTraits<T> {
-  using type = T;
-};
-
-/**
- * @brief Specialisation of RealTypeTraits for std::complex.
- * @tparam T The underlying floating-point type.
- */
-template <Real T>
-struct RealTypeTraits<std::complex<T>> {
-  using type = T;
-};
+struct RealTypeTraits : Internal::DefaultRealType<T> {};
 
 /**
  * @brief Concept for a type that has declared an associated real type.
