@@ -121,7 +121,9 @@ concepts are present.
 
 Full documentation, including the design rationale, is in
 [`docs/mainpage.md`](docs/mainpage.md) and in the Doxygen output built by
-`-DNUMERICCONCEPTS_BUILD_DOCS=ON`.
+`-DNUMERICCONCEPTS_BUILD_DOCS=ON`. That output is not published anywhere yet;
+[`docs/publishing-documentation.md`](docs/publishing-documentation.md) is the
+recipe for putting it on GitHub Pages.
 
 ## Requirements
 
