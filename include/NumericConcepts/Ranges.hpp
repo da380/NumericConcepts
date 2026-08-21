@@ -1,5 +1,8 @@
 #pragma once
 
+#include <ranges>
+#include <type_traits>
+
 #include "Numeric.hpp"
 
 /**
@@ -101,6 +104,425 @@ concept NumericWritableRange =
     IntegralWritableRange<T> or RealOrComplexWritableRange<T>;
 
 /**
+ * @name Output ranges
+ *
+ * The counterpart of the output iterators. The Writable concepts take the value
+ * type from the range itself, so they ask "can this range be written through
+ * with its own elements?". These take it as an argument, and ask "can a Value
+ * be written into this range?", which is the more general question: a
+ * `std::vector<double>` is a RealOutputRange for `float` as well as for
+ * `double`.
+ *
+ * The category is tested against the value type with references and
+ * cv-qualification removed, so the idiomatic `const T &` spelling — the one
+ * `std::ranges::fill` and friends use — works as well as a plain `T`.
+ * @{
+ */
+
+/**
+ * @brief Concept for a range that a integral Value can be written into.
+ * @tparam T The range type to check.
+ * @tparam Value The type to be written into it.
+ */
+template <typename T, typename Value>
+concept IntegralOutputRange = requires() {
+  requires std::ranges::output_range<T, Value>;
+  requires Integral<std::remove_cvref_t<Value>>;
+};
+
+/**
+ * @brief Concept for a range that a real (floating-point) Value can be written
+ * into.
+ * @tparam T The range type to check.
+ * @tparam Value The type to be written into it.
+ */
+template <typename T, typename Value>
+concept RealOutputRange = requires() {
+  requires std::ranges::output_range<T, Value>;
+  requires Real<std::remove_cvref_t<Value>>;
+};
+
+/**
+ * @brief Concept for a range that a complex Value can be written into.
+ * @tparam T The range type to check.
+ * @tparam Value The type to be written into it.
+ */
+template <typename T, typename Value>
+concept ComplexOutputRange = requires() {
+  requires std::ranges::output_range<T, Value>;
+  requires Complex<std::remove_cvref_t<Value>>;
+};
+
+/**
+ * @brief Concept for a range that a real or complex Value can be written into.
+ * @tparam T The range type to check.
+ * @tparam Value The type to be written into it.
+ */
+template <typename T, typename Value>
+concept RealOrComplexOutputRange = requires() {
+  requires std::ranges::output_range<T, Value>;
+  requires RealOrComplex<std::remove_cvref_t<Value>>;
+};
+
+/**
+ * @brief Concept for a range that a numeric Value can be written into.
+ * @tparam T The range type to check.
+ * @tparam Value The type to be written into it.
+ */
+template <typename T, typename Value>
+concept NumericOutputRange = requires() {
+  requires std::ranges::output_range<T, Value>;
+  requires Numeric<std::remove_cvref_t<Value>>;
+};
+
+/** @} */
+
+/**
+ * @name Strength refinements
+ *
+ * The concepts above require only `std::ranges::input_range`, which is the
+ * weakest useful requirement. Numerical code frequently needs more: a size
+ * known up front, indexing, or contiguous storage to hand to a C or Fortran
+ * routine. These refinements add exactly that, and nothing else.
+ *
+ * There are no view counterparts: a view is a range, so combine the refinement
+ * with `std::ranges::view` directly where one is required.
+ * @{
+ */
+
+/**
+ * @brief Concept for a sized range whose size is known in constant time, whose
+ * value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralSizedRange = requires() {
+  requires IntegralRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a sized range whose size is known in constant time, whose
+ * value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealSizedRange = requires() {
+  requires RealRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a sized range whose size is known in constant time, whose
+ * value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexSizedRange = requires() {
+  requires ComplexRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a sized range whose size is known in constant time, whose
+ * value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexSizedRange = requires() {
+  requires RealOrComplexRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a sized range whose size is known in constant time, whose
+ * value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericSizedRange = requires() {
+  requires NumericRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a writable sized range whose size is known in constant
+ * time, whose value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralWritableSizedRange = requires() {
+  requires IntegralWritableRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a writable sized range whose size is known in constant
+ * time, whose value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealWritableSizedRange = requires() {
+  requires RealWritableRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a writable sized range whose size is known in constant
+ * time, whose value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexWritableSizedRange = requires() {
+  requires ComplexWritableRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a writable sized range whose size is known in constant
+ * time, whose value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexWritableSizedRange = requires() {
+  requires RealOrComplexWritableRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a writable sized range whose size is known in constant
+ * time, whose value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericWritableSizedRange = requires() {
+  requires NumericWritableRange<T>;
+  requires std::ranges::sized_range<T>;
+};
+
+/**
+ * @brief Concept for a random-access range that can be indexed in constant
+ * time, whose value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralRandomAccessRange = requires() {
+  requires IntegralRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a random-access range that can be indexed in constant
+ * time, whose value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealRandomAccessRange = requires() {
+  requires RealRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a random-access range that can be indexed in constant
+ * time, whose value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexRandomAccessRange = requires() {
+  requires ComplexRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a random-access range that can be indexed in constant
+ * time, whose value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexRandomAccessRange = requires() {
+  requires RealOrComplexRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a random-access range that can be indexed in constant
+ * time, whose value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericRandomAccessRange = requires() {
+  requires NumericRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a writable random-access range that can be indexed in
+ * constant time, whose value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralWritableRandomAccessRange = requires() {
+  requires IntegralWritableRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a writable random-access range that can be indexed in
+ * constant time, whose value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealWritableRandomAccessRange = requires() {
+  requires RealWritableRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a writable random-access range that can be indexed in
+ * constant time, whose value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexWritableRandomAccessRange = requires() {
+  requires ComplexWritableRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a writable random-access range that can be indexed in
+ * constant time, whose value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexWritableRandomAccessRange = requires() {
+  requires RealOrComplexWritableRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a writable random-access range that can be indexed in
+ * constant time, whose value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericWritableRandomAccessRange = requires() {
+  requires NumericWritableRange<T>;
+  requires std::ranges::random_access_range<T>;
+};
+
+/**
+ * @brief Concept for a contiguous range whose elements are stored contiguously,
+ * whose value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralContiguousRange = requires() {
+  requires IntegralRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a contiguous range whose elements are stored contiguously,
+ * whose value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealContiguousRange = requires() {
+  requires RealRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a contiguous range whose elements are stored contiguously,
+ * whose value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexContiguousRange = requires() {
+  requires ComplexRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a contiguous range whose elements are stored contiguously,
+ * whose value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexContiguousRange = requires() {
+  requires RealOrComplexRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a contiguous range whose elements are stored contiguously,
+ * whose value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericContiguousRange = requires() {
+  requires NumericRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a writable contiguous range whose elements are stored
+ * contiguously, whose value type is integral.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept IntegralWritableContiguousRange = requires() {
+  requires IntegralWritableRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a writable contiguous range whose elements are stored
+ * contiguously, whose value type is real (floating-point).
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealWritableContiguousRange = requires() {
+  requires RealWritableRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a writable contiguous range whose elements are stored
+ * contiguously, whose value type is complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept ComplexWritableContiguousRange = requires() {
+  requires ComplexWritableRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a writable contiguous range whose elements are stored
+ * contiguously, whose value type is real or complex.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept RealOrComplexWritableContiguousRange = requires() {
+  requires RealOrComplexWritableRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/**
+ * @brief Concept for a writable contiguous range whose elements are stored
+ * contiguously, whose value type is numeric.
+ * @tparam T The range type to check.
+ */
+template <typename T>
+concept NumericWritableContiguousRange = requires() {
+  requires NumericWritableRange<T>;
+  requires std::ranges::contiguous_range<T>;
+};
+
+/** @} */
+
+/**
  * @brief Concept for a view whose value type is integral.
  * @tparam T The view type to check.
  */
@@ -184,6 +606,15 @@ concept SameRangeValueType = requires() {
                         std::ranges::range_value_t<Ts>> &&
            ...);
 };
+
+/**
+ * @brief Type alias to get the value type of a range.
+ * @details A spelling of `std::ranges::range_value_t` that mirrors
+ * IteratorValue, so that the range and iterator vocabularies read the same way.
+ * @tparam T The range type.
+ */
+template <std::ranges::range T>
+using RangeValue = std::ranges::range_value_t<T>;
 
 /**
  * @brief Type alias to get the underlying precision of a real or complex range.

@@ -1,28 +1,46 @@
-# Doxyfile Configuration Template
+# Doxygen configuration for NumericConcepts.
+# Processed by CMake: @VAR@ placeholders are substituted at configure time.
 
-# --- Project Info ---
 PROJECT_NAME           = "@PROJECT_NAME@"
 PROJECT_NUMBER         = "@PROJECT_VERSION@"
-PROJECT_BRIEF          = "A C++20 library defining concepts for numeric types"
-STRIP_FROM_PATH        = "@CMAKE_SOURCE_DIR@"
+PROJECT_BRIEF          = "@PROJECT_DESCRIPTION@"
 
-# --- Output ---
-OUTPUT_DIRECTORY       = "@CMAKE_CURRENT_BINARY_DIR@/doxygen"
-CREATE_SUBDIRS         = YES
+OUTPUT_DIRECTORY       = "@DOXYGEN_OUTPUT_DIR@"
 HTML_OUTPUT            = html
 GENERATE_LATEX         = NO
-USE_MDFILE_AS_MAINPAGE = @CMAKE_SOURCE_DIR@/docs/mainpage.md
+CREATE_SUBDIRS         = NO
 
-# --- Input ---
-INPUT                  = "@CMAKE_SOURCE_DIR@/include" \
-                         "@CMAKE_SOURCE_DIR@/examples" \
-                         "@CMAKE_SOURCE_DIR@/docs"
+INPUT                  = "@PROJECT_SOURCE_DIR@/include" \
+                         "@PROJECT_SOURCE_DIR@/examples" \
+                         "@PROJECT_SOURCE_DIR@/docs/mainpage.md"
+FILE_PATTERNS          = *.hpp *.cpp *.md
 RECURSIVE              = YES
-EXTRACT_ALL            = YES
-EXTRACT_PRIVATE        = YES
-EXTRACT_STATIC         = YES
+STRIP_FROM_PATH        = "@PROJECT_SOURCE_DIR@"
+USE_MDFILE_AS_MAINPAGE = "@PROJECT_SOURCE_DIR@/docs/mainpage.md"
 
-# --- Graphics (optional, but recommended) ---
-HAVE_DOT               = YES
-CALL_GRAPH             = YES
-CALLER_GRAPH           = YES
+# Everything public is documented; the @internal helpers are implementation
+# detail and are deliberately left out.
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+INTERNAL_DOCS          = NO
+EXCLUDE_SYMBOLS        = NumericConcepts::Internal
+HIDE_UNDOC_MEMBERS     = NO
+
+# Call graphs say nothing useful about a library of concepts, and drawing them
+# would make graphviz a build dependency.
+HAVE_DOT               = NO
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO
+
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+SORT_MEMBER_DOCS       = NO
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = FAIL_ON_WARNINGS
