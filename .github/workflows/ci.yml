@@ -1,45 +1,219 @@
-name: C++ CI
+name: CI
 
-# 1. Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: [main, develop]
   pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [main, develop]
   workflow_dispatch:
 
-# 2. A workflow run is made up of one or more jobs that can run sequentially or in parallel
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # This workflow contains a single job called "build-and-test"
   build-and-test:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # gcc-10 / clang-16 are the floor the README claims support for, so
+          # they are tested rather than assumed; the rest are current releases.
+          - name: ubuntu / gcc-10
+            os: ubuntu-22.04
+            cc: gcc-10
+            cxx: g++-10
+            packages: g++-10
+          - name: ubuntu / gcc-14
+            os: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
+            packages: g++-14
+          - name: ubuntu / clang-16
+            os: ubuntu-24.04
+            cc: clang-16
+            cxx: clang++-16
+            packages: clang-16
+          - name: ubuntu / clang-18 + libc++
+            os: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+            cxxflags: -stdlib=libc++
+            packages: clang-18 libc++-18-dev libc++abi-18-dev
+          - name: macos / apple-clang
+            os: macos-14
+            cc: clang
+            cxx: clang++
+          - name: windows / msvc
+            os: windows-2022
+            cc: cl
+            cxx: cl
 
-    # 3. Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      # Sets up the build directory
-      - name: Create build directory
-        run: cmake -E make_directory ${{github.workspace}}/build
+      - name: Install compiler packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.packages }}
 
-      # Runs CMake to configure the project, enabling tests
-      - name: Configure CMake
+      - name: Configure
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+          CXXFLAGS: ${{ matrix.cxxflags }}
         run: >
-          cmake -B ${{github.workspace}}/build 
-          -S ${{github.workspace}}
-          -DBUILD_TESTS=ON
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DNUMERICCONCEPTS_BUILD_TESTS=ON
+          -DNUMERICCONCEPTS_BUILD_EXAMPLES=ON
 
-      # Builds the project
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build
+      - name: Build tests
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build build --config Release --parallel --target numericconcepts_tests \
+            2>&1 | tee build-tests.log
 
-      # Runs the tests      
-      - name: Run Tests
-      # Use the built-in test target which calls ctest with the correct configuration
-        run: cmake --build ${{github.workspace}}/build --target test
+      - name: Build examples
+        shell: bash
+        run: |
+          set -o pipefail
+          cmake --build build --config Release --parallel 2>&1 \
+            | tee build-examples.log
+
+      # Compiler diagnostics are buried in the raw log, which needs repository
+      # admin to download. Repeating the first few as annotations puts them on
+      # the run summary, where anyone looking at a red tick can see them.
+      # Compiler diagnostics are buried in the raw log, which needs repository
+      # admin to download. Repeating the important lines as annotations puts
+      # them on the run summary, where anyone with read access can see them.
+      # GitHub runs bash with -eo pipefail, so nothing here may abort the step.
+      - name: Surface the failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          emit() {  # emit <level> <label> <text>
+            while IFS= read -r line; do
+              [ -n "$line" ] && printf '::%s::[%s] %s\n' "$1" "$2" "${line//%/%25}"
+            done <<< "$3"
+          }
+          for log in build-tests.log build-examples.log; do
+            [ -f "$log" ] || continue
+            # The diagnostics themselves.
+            emit error "$log" \
+              "$(grep -iE "(: |\()error( C[0-9]+)?[:)]" "$log" | sed -n '1,6p')"
+            # For a template error the useful part is the instantiation trail,
+            # which is what names a file of ours rather than a standard header.
+            emit warning "$log" \
+              "$(grep -E "(examples|tests|include)[/\\][^ ]*: (note|error):" "$log" \
+                 | sed -n '1,8p')"
+            # And the tail, which carries the failure of any custom build step.
+            emit notice "$log" "$(grep -v '^[[:space:]]*$' "$log" | tail -10)"
+          done
+          exit 0
+
+      - name: Test
+        run: ctest --test-dir build --build-config Release --output-on-failure
+
+  # The two things a consumer actually depends on: that the C++20 requirement
+  # travels with the target, and that the namespaced name exists in both
+  # find_package and FetchContent builds. Neither consumer sets a standard.
+  consume:
+    name: consume / ${{ matrix.method }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        method: [find_package, FetchContent, FetchContent-export]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install NumericConcepts
+        if: matrix.method == 'find_package'
+        run: |
+          cmake -S . -B build -DCMAKE_INSTALL_PREFIX="$PWD/stage"
+          cmake --install build
+
+      - name: Write the consumer project
+        run: |
+          mkdir -p consumer
+          cat > consumer/main.cpp <<'CPP'
+          #include <NumericConcepts/NumericConcepts.hpp>
+          #include <complex>
+          #include <vector>
+          static_assert(NumericConcepts::Real<double>);
+          static_assert(NumericConcepts::ComplexRange<std::vector<std::complex<double>>>);
+          int main() {}
+          CPP
+          cat > consumer/CMakeLists.txt <<'CMAKE'
+          cmake_minimum_required(VERSION 3.15)
+          project(Consumer LANGUAGES CXX)
+          # Deliberately no CMAKE_CXX_STANDARD here: the requirement must come
+          # from the NumericConcepts target.
+          if(METHOD STREQUAL "find_package")
+            find_package(NumericConcepts REQUIRED)
+          else()
+            include(FetchContent)
+            FetchContent_Declare(NumericConcepts SOURCE_DIR "${SOURCE_DIR}")
+            FetchContent_MakeAvailable(NumericConcepts)
+          endif()
+          add_executable(app main.cpp)
+          target_link_libraries(app PRIVATE NumericConcepts::NumericConcepts)
+
+          # A library that links NumericConcepts publicly and exports itself
+          # can only be installed if NumericConcepts is in an export set too.
+          # That is why NUMERICCONCEPTS_INSTALL stays on for a subproject, so
+          # the case is built rather than assumed.
+          if(METHOD STREQUAL "FetchContent-export")
+            add_library(consumerlib INTERFACE)
+            target_link_libraries(consumerlib
+                                  INTERFACE NumericConcepts::NumericConcepts)
+            install(TARGETS consumerlib EXPORT ConsumerTargets)
+            install(EXPORT ConsumerTargets FILE ConsumerTargets.cmake
+                    NAMESPACE Consumer:: DESTINATION lib/cmake/Consumer)
+          endif()
+          CMAKE
+
+      - name: Configure and build the consumer
+        run: |
+          cmake -S consumer -B consumer/build \
+            -DMETHOD=${{ matrix.method }} \
+            -DSOURCE_DIR="$PWD" \
+            -DCMAKE_PREFIX_PATH="$PWD/stage" \
+            -DCMAKE_INSTALL_PREFIX="$PWD/consumer/stage"
+          cmake --build consumer/build
+
+      - name: Install the consumer
+        if: matrix.method == 'FetchContent-export'
+        run: cmake --install consumer/build
+
+  format:
+    name: clang-format
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      # Pinned: a different clang-format version reformats differently, and a
+      # style-only failure here would say nothing useful.
+      - run: sudo apt-get update && sudo apt-get install -y clang-format-18
+      - run: |
+          clang-format-18 --version
+          clang-format-18 --dry-run -Werror \
+            include/NumericConcepts/*.hpp tests/*.cpp examples/*.cpp
+
+  docs:
+    name: doxygen
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y doxygen
+      - run: cmake -S . -B build -DNUMERICCONCEPTS_BUILD_DOCS=ON
+      - run: cmake --build build --target docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-html
+          path: build/docs/html
