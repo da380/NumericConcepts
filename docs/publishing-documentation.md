@@ -82,7 +82,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y doxygen
 
       - run: cmake -S . -B build -DNUMERICCONCEPTS_BUILD_DOCS=ON
-      - run: cmake --build build --target docs
+      - run: cmake --build build --target numericconcepts_docs
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5

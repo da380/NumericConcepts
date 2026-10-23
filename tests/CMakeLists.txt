@@ -50,5 +50,6 @@ foreach(_header Numeric Algebra Iterators Ranges Functions Version
     list(APPEND _self_contained_sources ${_src})
 endforeach()
 
-add_library(test_self_contained_headers OBJECT ${_self_contained_sources})
-target_link_libraries(test_self_contained_headers PRIVATE NumericConcepts::NumericConcepts)
+add_library(numericconcepts_self_contained_headers OBJECT ${_self_contained_sources})
+target_link_libraries(numericconcepts_self_contained_headers PRIVATE
+    NumericConcepts::NumericConcepts)

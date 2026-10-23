@@ -8,11 +8,10 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
     @ONLY)
 
-add_custom_target(docs ALL
+# Prefixed, like every target here, so that it cannot collide with a docs
+# target of the project consuming this one.
+add_custom_target(numericconcepts_docs ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen"
     VERBATIM)
-
-# Keep the historical target name working.
-add_custom_target(doc DEPENDS docs)
