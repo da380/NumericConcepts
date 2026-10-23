@@ -72,14 +72,10 @@ option(NUMERICCONCEPTS_BUILD_EXAMPLES "Build the examples" ${NUMERICCONCEPTS_IS_
 option(NUMERICCONCEPTS_BUILD_TESTS "Build the tests" OFF)
 option(NUMERICCONCEPTS_BUILD_DOCS "Build the Doxygen documentation" OFF)
 
-# Deprecated unprefixed spellings, kept so that existing scripts keep working.
-foreach(_suffix TESTS DOCS)
-    if(DEFINED BUILD_${_suffix})
-        message(DEPRECATION
-            "BUILD_${_suffix} is deprecated; use NUMERICCONCEPTS_BUILD_${_suffix} instead.")
-        set(NUMERICCONCEPTS_BUILD_${_suffix} ${BUILD_${_suffix}})
-    endif()
-endforeach()
+# Only the prefixed spellings are read. The unprefixed BUILD_TESTS and
+# BUILD_DOCS that used to be honoured here belong to whichever project is
+# consuming this one, so they switched on this project's tests and docs in
+# every superbuild that set them for itself.
 
 # --- Installation and packaging ---
 

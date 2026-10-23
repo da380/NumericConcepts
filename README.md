@@ -206,7 +206,12 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-The unprefixed `BUILD_TESTS` and `BUILD_DOCS` still work, but are deprecated.
+Only these prefixed names are read. The unprefixed `BUILD_TESTS` and
+`BUILD_DOCS` used to be honoured too, but they belong to whichever project
+consumes this one, and setting them there switched on this project's tests and
+docs as well. Every target is prefixed `numericconcepts_` for the same reason:
+`numericconcepts_docs`, and the examples as `numericconcepts_01-numeric_types`
+and so on, whose programs keep their plain names.
 
 `NUMERICCONCEPTS_INSTALL` stays on when NumericConcepts is a subproject, which
 differs from the common top-level-only default. A library that links it
