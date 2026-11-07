@@ -140,7 +140,7 @@ Numerical code usually needs more, and the strength refinements above supply it
 without the caller writing the same three lines each time:
 
 ```cpp
-// Before: every consumer wrote its own refinement.
+// Without them, every consumer writes its own refinement.
 template <typename T>
 concept SampledSignal = requires {
   requires NumericConcepts::RealRange<T>;
@@ -148,7 +148,7 @@ concept SampledSignal = requires {
   requires std::ranges::sized_range<T>;
 };
 
-// Now:
+// With them:
 template <NumericConcepts::RealRandomAccessRange T>
 void Resample(const T& signal);
 ```

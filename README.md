@@ -121,9 +121,7 @@ concepts are present.
 
 Full documentation, including the design rationale, is in
 [`docs/mainpage.md`](docs/mainpage.md) and in the Doxygen output built by
-`-DNUMERICCONCEPTS_BUILD_DOCS=ON`. That output is not published anywhere yet;
-[`docs/publishing-documentation.md`](docs/publishing-documentation.md) is the
-recipe for putting it on GitHub Pages.
+`-DNUMERICCONCEPTS_BUILD_DOCS=ON`.
 
 ## Requirements
 
@@ -184,7 +182,7 @@ list separated by `:` on Unix or `;` on Windows.
 
 ### Vendoring
 
-The library is five headers with no dependencies beyond the standard library, so
+The library is seven headers with no dependencies beyond the standard library, so
 copying `include/NumericConcepts` into your own tree is a perfectly reasonable
 option.
 
@@ -207,9 +205,8 @@ ctest --test-dir build --output-on-failure
 ```
 
 Only these prefixed names are read. The unprefixed `BUILD_TESTS` and
-`BUILD_DOCS` used to be honoured too, but they belong to whichever project
-consumes this one, and setting them there switched on this project's tests and
-docs as well. Every target is prefixed `numericconcepts_` for the same reason:
+`BUILD_DOCS` belong to whichever project consumes this one, and honouring them
+would switch on this project's tests and docs whenever that project set them. Every target is prefixed `numericconcepts_` for the same reason:
 `numericconcepts_docs`, and the examples as `numericconcepts_01-numeric_types`
 and so on, whose programs keep their plain names.
 

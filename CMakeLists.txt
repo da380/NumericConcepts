@@ -73,9 +73,9 @@ option(NUMERICCONCEPTS_BUILD_TESTS "Build the tests" OFF)
 option(NUMERICCONCEPTS_BUILD_DOCS "Build the Doxygen documentation" OFF)
 
 # Only the prefixed spellings are read. The unprefixed BUILD_TESTS and
-# BUILD_DOCS that used to be honoured here belong to whichever project is
-# consuming this one, so they switched on this project's tests and docs in
-# every superbuild that set them for itself.
+# BUILD_DOCS belong to whichever project is consuming this one, so honouring
+# them would switch on this project's tests and docs in every superbuild that
+# set them for itself.
 
 # --- Installation and packaging ---
 
@@ -99,7 +99,7 @@ if(NUMERICCONCEPTS_INSTALL)
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     )
 
-    # SameMajorVersion, rather than the AnyNewerVersion this used to be, matches
+    # SameMajorVersion, rather than AnyNewerVersion, matches
     # the promise the README makes: within a major version the vocabulary only
     # grows, so any later release satisfies an earlier request, but a future 2.x
     # must not silently satisfy find_package(NumericConcepts 1.0).
